@@ -1,0 +1,21 @@
+{
+  "name": "dsh-mobile-ios",
+  "version": "1.0.0",
+  "description": "Mobile and iOS adaptation layer for the DSH web interface: safe areas, drawer, keyboard, dialogs, touch targets.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

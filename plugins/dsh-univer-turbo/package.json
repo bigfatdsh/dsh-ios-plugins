@@ -1,0 +1,55 @@
+{
+  "name": "dsh-univer-turbo",
+  "version": "1.0.10",
+  "private": true,
+  "type": "module",
+  "description": "把 dsh-univer-office 的工具调用成本压到极致：14 个 univer_* 工具收敛成一个紧凑门面（省 ~2,600 token/请求），结果进入对话前先做 JSON 语义压缩，重复的只读调用只回一行指针，batch 把 N 次往返压成 1 次，截图按预算与附件上限治理。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "univer",
+    "token",
+    "tool-surface",
+    "context",
+    "cache"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./ops": "./lib/ops.js",
+    "./compact": "./lib/compact.js",
+    "./memo": "./lib/memo.js",
+    "./facade": "./lib/facade.js",
+    "./config": "./lib/config.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./docs/*": "./docs/*",
+    "./advice": "./lib/advice.js"
+  },
+  "files": [
+    "lib",
+    "tools",
+    "test",
+    "docs",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "meta": {
+    "title": "Univer 调用提速降耗 Univer Turbo",
+    "description": "工具面收敛 + 结果语义压缩 + 只读记忆化 + 批处理 + 截图治理；每一项都有单元测试与真实 ToolRuntime 集成测试兜底。"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "measure": "node tools/measure.mjs",
+    "extract": "node tools/extract-runtime.mjs",
+    "replay": "node tools/replay.mjs",
+    "savings": "node tools/savings.mjs"
+  }
+}

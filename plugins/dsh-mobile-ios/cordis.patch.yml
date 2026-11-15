@@ -1,0 +1,5 @@
+# dsh-mobile-ios —— mobile / iOS adaptation layer for the web profile.
+# Host half is an empty stub; all behaviour lives in the browser half (client.js).
+- insert:
+    - id: mobile-ios
+      name: dsh-mobile-ios

@@ -1,0 +1,50 @@
+# dsh-univer-turbo bundle 补丁。
+#
+# 本文件只插入一行：把「Univer 调用提速降耗」插件挂到 Host 根部。
+#
+# 为什么挂在根、而不是写进某个 preset：
+#   * `dsh-univer-office` 是 profile 级 bundle，它的 14 个工具注册在**全局层**；
+#     本插件需要先看到它们，再对每个 agent 打上 restrict 掩码。
+#   * 插件的 `inject: ['agents']` 让它等到 agents 注册表就绪，然后监听 `agent/created`，
+#     在**每个 agent 自己的 context** 上 `inject(['tools'], …)` 完成安装
+#     （agent 作用域是 isolate 出来的独立作用域，根上的监听器收不到它的事件）。
+#
+# 这一行不改变模型选择、不改变系统提示、不改写历史消息：
+# 它只在「每个会话的第一个请求之前」调整一次工具表，并让结果在进入对话之前变小。
+
+- insert:
+    - id: univer-turbo
+      name: 'dsh-univer-turbo'
+      config:
+        # 收窄工具面：隐藏 14 个 univer_* 工具，只留一个紧凑门面。
+        # 实测：11,511 字符 ≈ 3,198 token/请求 → ~1,500 字符 ≈ 400 token/请求。
+        collapseTools: true
+        # 门面工具名（模型看到的名字）。
+        facadeName: 'univer'
+        # 结果压缩总开关。
+        compactResults: true
+        # 单个纯文本结果的内联预算（字符）。超过就先做 JSON 语义剪枝，再按预算截断。
+        maxInlineChars: 1400
+        # JSON 结果里数组最多保留多少项、单个字符串最多保留多少字符。
+        maxArrayItems: 40
+        maxStringChars: 240
+        # JSON 结果里是否删除空值（[] / {} / null / ""）。
+        pruneEmpty: true
+        # 只读操作记忆化：完全相同的调用直接回一行指针（上次的载荷还在上文）。
+        # 实测两场 PPT 会话里有 26/179 与 32/141 次完全重复的调用。
+        memoizeReads: true
+        # 命中时载荷小于该字符数就原样重发，否则只回指针。
+        memoPayloadChars: 600
+        # 每个 agent 会话最多向模型投递多少张截图；超出后只留文字。0 = 不限制。
+        # 实测截图是最大的单项「携带成本」（两场会话分别 1.75M / 1.47M token）。
+        screenshotBudget: 8
+        # 文档没变时，同一目标的截图不重复投递图片。
+        dedupeImages: true
+        # batch 中连续只读操作的并发上限。1 = 严格串行。
+        readConcurrency: 2
+        # 在系统提示里加一段「整文件写入很贵」的静态提示（约 71 token/请求）。
+        # 这是**行为引导而非机制**：DSH 在派发工具之前就把助手消息落库了，
+        # 插件无法回收已落库的工具调用参数（论证见 lib/advice.js）。
+        writeCostHint: true
+        # 调试日志。
+        debug: false
